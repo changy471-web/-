@@ -1,0 +1,11 @@
+From the perspective of implementation logic, the separation algorithms are categorized into two types:
+
+1. Direct Library Invocation: The Linear, Poly2, and Poly3 models directly utilize the built-in FastICA module from scikit-learn. The polynomial mapping methods merely employ PolynomialFeatures to perform a high-dimensional feature mapping of the data prior to feeding it into the ICA algorithm.
+
+2. Deeply Customized Separation Logic (Lines 16-56): The most complex and specialized separation logic within the code resides in the SplinePNLICA class. This is a custom-implemented Post-Nonlinear (PNL) blind source separation algorithm designed specifically to tackle nonlinear mixtures.
+
+Its core separation philosophy is executed within the fit_transform function: it employs scipy.optimize.minimize (specifically using the L-BFGS-B optimizer) to iteratively adjust the B-spline control point coefficients (init_coeffs_all).
+
+Its optimization objective is formulated in the _objective_function: to approximate the maximum non-Gaussianity of the signals by maximizing the sum of the absolute kurtosis values of the extracted components (implemented in the code by returning the negative sum of absolute kurtosis to seek the minimum), thereby achieving signal separation. After each iteration with a new set of spline coefficients, the mapped data is fed into a standard FastICA to evaluate the separation efficacy.
+
+Spline PNL-ICA参考https:// doi.org/10.1109/TCSI.2004.826210.
